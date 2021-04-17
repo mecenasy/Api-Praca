@@ -10,4 +10,3 @@ App.getInstance()
    .connectToDataBase()
    .initializeControllers()
    .serverRun();
-console.log("🚀 ~ file: server.ts ~ line 13 ~ process.env.HOSTNAME", process.env.HOSTNAME)

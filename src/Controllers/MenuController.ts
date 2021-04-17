@@ -30,7 +30,7 @@ export class MenuController extends Controller {
          position,
          menuSide,
          hidden,
-         image: `${BASE_HOST_PROTOCOL}://${BASE_HOST_URL}/${ASSETS_FOLDER}/${image}`,
+         image: `${this.baseHostUrl}/${image}`,
       }));
 
       res
