@@ -1,26 +1,34 @@
 
 import { Schema, Document, model } from 'mongoose';
+import { Role } from './Role';
 
 export interface IUser {
    user: string;
    password: string;
-   role: any;
+   role: Role;
    personId: any;
    isDefaultPassword?: boolean;
 }
 
 const userSchema = new Schema({
-   user: String,
+   user: {
+      type: String,
+      unique: true,
+   },
    password: String,
    personId: {
       type: Schema.Types.ObjectId,
       ref: 'person',
    },
    role: {
-      type: Schema.Types.ObjectId,
-      ref: 'role',
+      type: String,
+      enum: [Role.Admin, Role.Student, Role.Teacher],
+      default: Role.Student,
    },
-   isDefaultPassword: Boolean,
+   isDefaultPassword: {
+      type: String,
+      default: true,
+   },
 });
 
 const userModel = model<IUser & Document>('user', userSchema);

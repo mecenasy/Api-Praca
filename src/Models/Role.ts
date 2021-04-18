@@ -12,7 +12,10 @@ export interface IRole {
 }
 
 const userRoleSchema = new Schema({
-   role: Role,
+   role: {
+      type: String,
+      enum: [Role.Admin, Role.Student, Role.Teacher],
+   },
 });
 
 export default model<IRole & Document>('role', userRoleSchema);

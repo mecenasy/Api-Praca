@@ -5,12 +5,14 @@ abstract class Controller implements IController {
    constructor(routePath: string) {
       this.routePath = routePath;
       this.router = Router();
-      this.baseHostUrl = `${BASE_HOST_PROTOCOL}://${BASE_HOST_URL}/${ASSETS_FOLDER}`;
+      this.baseHostUrl = `${BASE_HOST_PROTOCOL}://${BASE_HOST_URL}`;
+      this.assetsUrl = `${this.baseHostUrl}/${ASSETS_FOLDER}`;
    }
 
    public routePath: string;
    public router: Router;
    public baseHostUrl: string;
+   public assetsUrl: string;
    public abstract initializeRoute = () => this;
 }
 

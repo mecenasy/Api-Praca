@@ -26,11 +26,14 @@ const menuSchema = new Schema<IMenu & Document>({
       unique: true,
       required: true,
    },
-   hidden :{
+   hidden: {
       type: Boolean,
       required: false,
    },
-   menuSide: String,
+   menuSide: {
+      type: String,
+      enum: [MenuSide.Left, MenuSide.Right],
+   },
    link: String,
    image: String,
 });

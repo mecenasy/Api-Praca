@@ -2,8 +2,9 @@ import express, { Application } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
-import  MongoDB from '../DB/MongoDB';
+import MongoDB from '../DB/MongoDB';
 import { IController } from '../Interface/IController';
+
 class App {
    constructor() {
       this.app = express();
@@ -42,7 +43,7 @@ class App {
       return this;
    }
 
-   public  connectToDataBase = (): App => {
+   public connectToDataBase = (): App => {
       new MongoDB();
 
       return this;
@@ -58,11 +59,11 @@ class App {
       return this;
    }
 
-   public  static = (): App => {
+   public static = (): App => {
       this.app.use(
          '/assets',
          express.static(
-           path.resolve(__dirname, '../assets'),
+            path.resolve(__dirname, '../assets'),
          ),
       );
       return this;

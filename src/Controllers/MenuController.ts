@@ -1,5 +1,5 @@
 import { Response, Request } from 'express';
-import MenuModel, { IMenu } from '../Models/Menu';
+import MenuModel, { IMenu, MenuSide } from '../Models/Menu';
 import Controller from './Controller';
 
 
@@ -19,40 +19,36 @@ export class MenuController extends Controller {
    }
 
    private getMenu = async (req: Request, res: Response) => {
-      const menu = await MenuModel
-         .find({})
+      const menu = await MenuModel.find({})
          .sort('position');
 
-      const menuItems = menu.map(({ name, shortName, link, position, menuSide, image, hidden }): IMenu => ({
-         name,
-         shortName,
-         link,
-         position,
-         menuSide,
-         hidden,
-         image: `${this.baseHostUrl}/${image}`,
-      }));
+      const menuItems = menu.map((item): IMenu => {
+         const { __v, _id, ...menuItem } = item.toJSON();
 
-      res
-         .send(menuItems)
+         return ({
+            ...menuItem,
+            image: `${this.assetsUrl}/${menuItem.image}`
+         });
+      });
+
+      res.send(menuItems)
          .status(200);
    }
 
    private addMenuItem = async (req: Request, res: Response) => {
       const { name, link, image, position, shortName, menuSide, hidden }: IMenu = req.body;
 
-      if (name && link && image) {
+      if (name && link && image && (menuSide === MenuSide.Left || menuSide === MenuSide.Right)) {
          const existingItem = await MenuModel.findOne({ name });
 
          if (existingItem) {
-            res
-               .send({ message: 'menu item exist' })
+            res.send({ message: 'menu item exist' })
                .status(400);
             return;
          }
 
-         await MenuModel
-            .insertMany({
+         try {
+            await MenuModel.insertMany({
                name,
                position,
                shortName,
@@ -62,14 +58,16 @@ export class MenuController extends Controller {
                hidden
             });
 
-         res
-            .send({ message: 'menu item added' })
-            .status(200);
-         return;
+            res.send({ message: 'menu item added' })
+               .status(200);
+            return;
+
+         } catch (error) {
+            res.send(error);
+         }
       }
 
-      res
-         .send({ message: 'data of menu item not complice' })
+      res.send({ message: 'data of menu item not complice' })
          .status(400);
    }
 }

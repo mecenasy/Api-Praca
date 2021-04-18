@@ -1,12 +1,17 @@
 import { Schema, Document, model } from "mongoose";
+import { Direction } from "./Direction";
+import { Specialty } from "./Specialty";
+import { IAddress } from "./Adress";
+import { Role } from "./Role";
 
+export interface Person extends Omit<IPerson, 'active'| 'album' > {
+   address: IAddress;
+   role: Role;
+}
 export interface IPerson {
-   userId?: any;
-   personId?: any;
    album: number;
-   direction: string;
-   department: string;
-   specialty: string;
+   direction: Direction;
+   specialty: Specialty;
    year: string;
    semester: string;
    group: string;
@@ -14,19 +19,20 @@ export interface IPerson {
    surname: string;
    email: string;
    phone: number;
-   photo: string;
-   role?: string;
+   photo?: string;
+   active: boolean;
 }
 
 const personSchema = new Schema({
-   userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-   },
    album: Number,
-   direction: String,
-   department: String,
-   specialty: String,
+   direction: {
+      type: String,
+      enum: [Direction.Informatics, Direction.Management],
+   },
+   specialty: {
+      type: String,
+      enum: [Specialty.Programming, Specialty.Networks],
+   },
    year: String,
    semester: String,
    group: String,
@@ -35,6 +41,10 @@ const personSchema = new Schema({
    email: String,
    phone: Number,
    photo: String,
+   active: {
+      type: Boolean,
+      default: true,
+   }
 });
 
 export default model<IPerson & Document>('person', personSchema);
