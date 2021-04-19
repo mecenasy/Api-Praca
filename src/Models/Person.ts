@@ -3,9 +3,8 @@ import { Direction } from "./Direction";
 import { Specialty } from "./Specialty";
 import { IAddress } from "./Address";
 import { Role } from "./Role";
-import { imageUrl } from "../helpers/hostUrlHelpers";
 
-export interface Person extends Omit<IPerson, 'active' | 'album' | 'addressId'> {
+export interface Person extends Omit<IPerson, 'album'> {
    address: IAddress;
    role: Role;
 }
@@ -21,12 +20,13 @@ export interface IPerson {
    email: string;
    phone: number;
    photo?: string;
-   addressId?: any;
-   active: boolean;
 }
 
 const personSchema = new Schema({
-   album: Number,
+   album: {
+      type: Number,
+      unique: true,
+   },
    direction: {
       type: String,
       enum: [Direction.Informatics, Direction.Management],
@@ -42,18 +42,7 @@ const personSchema = new Schema({
    surname: String,
    email: String,
    phone: Number,
-   photo: {
-      type: String,
-      get: imageUrl,
-   },
-   addressId: {
-      type: Schema.Types.ObjectId,
-      ref: 'address',
-   },
-   active: {
-      type: Boolean,
-      default: true,
-   }
+   photo: String,
 });
 
 export default model<IPerson & Document>('person', personSchema);

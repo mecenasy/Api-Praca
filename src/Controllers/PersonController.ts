@@ -3,6 +3,9 @@ import PersonModel, { Person } from '../Models/Person';
 import UserModel from '../Models/User';
 import AddressModel from '../Models/Address';
 import Controller from './Controller';
+import { imageUrl } from '../helpers/hostUrlHelpers';
+import { Aggregate } from 'mongoose';
+import { Types } from 'mongoose';
 
 
 export class PersonController extends Controller {
@@ -26,20 +29,36 @@ export class PersonController extends Controller {
    private getPersonById = async (req: Request, res: Response) => {
       const personId = req.params.personId;
 
-      if (personId) {
+      if (!personId) {
          res.status(404)
             .send({ message: 'person id must bu given' });
       }
-      const person = await PersonModel.findById(personId);
+      const persons: Person[] = await new Aggregate()
+      .model(PersonModel)
+      .project({
+         album: 1,
+         direction: 1,
+         specialty: 1,
+         year: 1,
+         semester: 1,
+         group: 1,
+         name: 1,
+         surname: 1,
+         photo: 1,
+         _id: 1
+      })
+      .match({ _id: Types.ObjectId(personId) })
+      .exec();
+      
+      const person: Person = persons[0]
+      
+      if (person?.photo) {
+         person.photo = imageUrl(person.photo);
+      }
 
       if (person) {
-         if (person.photo) {
-            person.photo = `${this.assetsUrl}/${person.photo}`;
-         }
-
          res.status(200)
             .send(person);
-
       } else {
          res.status(404)
             .send({ message: 'person not found' });
@@ -56,22 +75,31 @@ export class PersonController extends Controller {
          userName = `${userName}${existingUser.length + 1}`;
       }
 
+      let count = await PersonModel.countDocuments();
+
+      const newPerson = new PersonModel(person);
+      newPerson.album = ++count;
+
+      const newAddress = new AddressModel(address);
+      newAddress.personId = newPerson;
+
       const newUser = new UserModel({
          role: userRole,
          user: userName,
+         personId: newPerson,
       });
 
-      const newPerson = new PersonModel(person);
-      const newAddress = new AddressModel(address);
-
-      newPerson.addressId = newAddress;
-      newUser.personId = newPerson;
-
-      await Promise.all([
-         newUser.save(),
-         newPerson.save(),
-         newAddress.save(),
-      ]);
+      try {
+         await Promise.all([
+            newUser.save(),
+            newPerson.save(),
+            newAddress.save(),
+         ]);
+      } catch (error) {
+         res.status(503)
+            .send(error);
+         return
+      }
 
       const {
          role,
@@ -79,14 +107,13 @@ export class PersonController extends Controller {
          isDefaultPassword
       } = newUser.toJSON();
 
-      const {
-         addressId,
-         ...restPerson
-      } = newPerson.toJSON();
+      if (person.photo) {
+         newPerson.photo = imageUrl(person.photo);
+      }
 
       res.status(201)
          .send({
-            person: restPerson,
+            person: newPerson,
             user: {
                role,
                user,

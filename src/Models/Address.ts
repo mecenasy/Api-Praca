@@ -6,6 +6,7 @@ export interface IAddress {
    country: string;
    number: string;
    zipCode: string;
+   personId: any;
 }
 
 const addressSchema = new Schema({
@@ -14,6 +15,10 @@ const addressSchema = new Schema({
    city: String,
    country: String,
    zipCode: String,
+   personId: {
+      type: Schema.Types.ObjectId,
+      ref: 'person',
+   },
 });
 
 export default model<IAddress & Document>('address', addressSchema);

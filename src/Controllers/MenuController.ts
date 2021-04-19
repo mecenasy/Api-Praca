@@ -1,4 +1,6 @@
 import { Response, Request } from 'express';
+import { Aggregate } from 'mongoose';
+import { imageUrl } from '../helpers/hostUrlHelpers';
 import MenuModel, { IMenu, MenuSide } from '../Models/Menu';
 import Controller from './Controller';
 
@@ -19,13 +21,24 @@ export class MenuController extends Controller {
    }
 
    private getMenu = async (req: Request, res: Response) => {
-      const menu = await MenuModel.find({})
-         .sort('position');
+      const menu: IMenu[] = await new Aggregate()
+         .model(MenuModel)
+         .project({
+            name: 1,
+            shortName: 1,
+            link: 1,
+            position: 1,
+            menuSide: 1,
+            image: 1,
+            hidden: 1,
+            _id: 0
+         })
+         .sort({ position: 1 })
+         .exec();
 
-      const menuItems = menu.map((item): IMenu => {
-         const { name, shortName, link, position, menuSide, image, hidden } = item;
+      const menuItems = menu.map(({ image, ...rest }): IMenu => {
 
-         return { name, shortName, link, position, menuSide, image, hidden };
+         return { ...rest, image: imageUrl(image) };
       });
 
       res.send(menuItems)

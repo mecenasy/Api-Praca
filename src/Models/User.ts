@@ -7,6 +7,7 @@ export interface IUser {
    password: string;
    role: Role;
    personId: any;
+   active?: boolean;
    isDefaultPassword?: boolean;
 }
 
@@ -29,6 +30,10 @@ const userSchema = new Schema({
       type: String,
       default: true,
    },
+   active: {
+      type: Boolean,
+      default: true,
+   }
 });
 
 const userModel = model<IUser & Document>('user', userSchema);

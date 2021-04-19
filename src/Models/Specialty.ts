@@ -1,8 +1,8 @@
 import { Schema, Document, model } from 'mongoose';
 
 export enum Specialty {
-   Programming = 'programming',
-   Networks = 'networks',
+   Programming = 'Programowanie',
+   Networks = 'Sieci',
 }
 
 export interface ISpecialty {

@@ -1,8 +1,8 @@
 import { Schema, Document, model } from 'mongoose';
 
 export enum Direction {
-   Informatics = 'informatics',
-   Management = 'management',
+   Informatics = 'Informatyka',
+   Management = 'Zarządzanie',
 }
 
 export interface IDirection {
