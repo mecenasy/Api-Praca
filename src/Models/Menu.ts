@@ -1,4 +1,5 @@
 import { Schema, Document, model } from "mongoose";
+import { imageUrl } from "../helpers/hostUrlHelpers";
 
 export enum MenuSide {
    Left = 'left',
@@ -35,7 +36,10 @@ const menuSchema = new Schema<IMenu & Document>({
       enum: [MenuSide.Left, MenuSide.Right],
    },
    link: String,
-   image: String,
+   image: {
+      type: String,
+      get: imageUrl,
+   },
 });
 
 export default model<IMenu & Document>('menu', menuSchema);

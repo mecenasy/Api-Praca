@@ -1,10 +1,11 @@
 import { Schema, Document, model } from "mongoose";
 import { Direction } from "./Direction";
 import { Specialty } from "./Specialty";
-import { IAddress } from "./Adress";
+import { IAddress } from "./Address";
 import { Role } from "./Role";
+import { imageUrl } from "../helpers/hostUrlHelpers";
 
-export interface Person extends Omit<IPerson, 'active'| 'album' > {
+export interface Person extends Omit<IPerson, 'active' | 'album' | 'addressId'> {
    address: IAddress;
    role: Role;
 }
@@ -20,6 +21,7 @@ export interface IPerson {
    email: string;
    phone: number;
    photo?: string;
+   addressId?: any;
    active: boolean;
 }
 
@@ -40,7 +42,14 @@ const personSchema = new Schema({
    surname: String,
    email: String,
    phone: Number,
-   photo: String,
+   photo: {
+      type: String,
+      get: imageUrl,
+   },
+   addressId: {
+      type: Schema.Types.ObjectId,
+      ref: 'address',
+   },
    active: {
       type: Boolean,
       default: true,

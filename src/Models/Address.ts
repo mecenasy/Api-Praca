@@ -1,19 +1,19 @@
 import { Schema, Document, model } from 'mongoose';
 
 export interface IAddress {
-   personId: any;
    street: string;
    city: string;
    country: string;
+   number: string;
    zipCode: string;
 }
 
 const addressSchema = new Schema({
-   personId: String,
    street: String,
+   number: String,
    city: String,
    country: String,
    zipCode: String,
 });
 
-export default model<IAddress & Document>('specialty', addressSchema);
+export default model<IAddress & Document>('address', addressSchema);

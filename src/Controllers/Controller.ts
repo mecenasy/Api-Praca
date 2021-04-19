@@ -1,12 +1,13 @@
 import { Router } from 'express';
+import { assetsUrl, baseHostUrl } from '../helpers/hostUrlHelpers';
 import { IController } from '../Interface/IController';
 
 abstract class Controller implements IController {
    constructor(routePath: string) {
       this.routePath = routePath;
       this.router = Router();
-      this.baseHostUrl = `${BASE_HOST_PROTOCOL}://${BASE_HOST_URL}`;
-      this.assetsUrl = `${this.baseHostUrl}/${ASSETS_FOLDER}`;
+      this.baseHostUrl = baseHostUrl();
+      this.assetsUrl = assetsUrl();
    }
 
    public routePath: string;

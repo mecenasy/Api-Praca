@@ -23,12 +23,9 @@ export class MenuController extends Controller {
          .sort('position');
 
       const menuItems = menu.map((item): IMenu => {
-         const { __v, _id, ...menuItem } = item.toJSON();
+         const { name, shortName, link, position, menuSide, image, hidden } = item;
 
-         return ({
-            ...menuItem,
-            image: `${this.assetsUrl}/${menuItem.image}`
-         });
+         return { name, shortName, link, position, menuSide, image, hidden };
       });
 
       res.send(menuItems)

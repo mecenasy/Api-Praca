@@ -1,6 +1,7 @@
 import { Response, Request } from 'express';
 import PersonModel, { Person } from '../Models/Person';
 import UserModel from '../Models/User';
+import AddressModel from '../Models/Address';
 import Controller from './Controller';
 
 
@@ -61,16 +62,31 @@ export class PersonController extends Controller {
       });
 
       const newPerson = new PersonModel(person);
+      const newAddress = new AddressModel(address);
 
+      newPerson.addressId = newAddress;
       newUser.personId = newPerson;
 
-      const { role, user, isDefaultPassword } = await newUser.save();
+      await Promise.all([
+         newUser.save(),
+         newPerson.save(),
+         newAddress.save(),
+      ]);
 
-      await newPerson.save();
+      const {
+         role,
+         user,
+         isDefaultPassword
+      } = newUser.toJSON();
+
+      const {
+         addressId,
+         ...restPerson
+      } = newPerson.toJSON();
 
       res.status(201)
          .send({
-            person: newPerson,
+            person: restPerson,
             user: {
                role,
                user,
