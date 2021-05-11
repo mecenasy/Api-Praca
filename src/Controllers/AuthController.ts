@@ -14,7 +14,7 @@ class AuthController extends Controller {
    public initializeRoute = () => {
       this.router
          .get('/logout', this.authenticate, this.logout)
-         .post('/refreshToken', this.authenticate, this.refreshToken)
+         .get('/refreshtoken', this.authenticate, this.refreshToken)
          .post(this.routePath, this.login)
          .put(this.routePath, this.authenticate, this.updateUserPassword)
          .delete(this.routePath, this.authenticate, this.isAdmin, this.removeUser);
@@ -28,14 +28,14 @@ class AuthController extends Controller {
 
          const { expiresIn, token } = issueJWT(userFounded);
 
-         res.cookie('jwt', token, { maxAge: expiresIn })
-            .status(200)
+         res.cookie('jwt', token, { maxAge: expiresIn });
+         res.status(200)
             .send({
+               loggedIn: true,
                name: userFounded?.user,
                personId: userFounded?.personId,
                role: userFounded?.role,
                token,
-               expiresIn
             });
 
       } catch (error) {
@@ -57,14 +57,14 @@ class AuthController extends Controller {
             if (isValid) {
                const { expiresIn, token } = issueJWT(user);
 
-               res.cookie('jwt', token, { maxAge: expiresIn })
-                  .status(200)
+               res.cookie('jwt', token, { maxAge: expiresIn });
+               res.status(200)
                   .send({
+                     loggedIn: true,
                      name: user.user,
                      personId: user.personId,
                      role: user.role,
                      token,
-                     expiresIn
                   });
             } else {
                res.status(401).send({ loggedIn: false, message: 'you are not authorized' })
@@ -82,7 +82,7 @@ class AuthController extends Controller {
       res.clearCookie('connect.sid');
       req.session.destroy(() => {
          res.status(200).send({
-            login: false,
+            loggedIn: false,
          });
       });
    }
