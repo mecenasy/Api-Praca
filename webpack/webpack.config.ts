@@ -66,6 +66,7 @@ const config = {
          ASSETS_FOLDER: JSON.stringify(process.env.ASSETS_FOLDER),
          BASE_HOST_URL: JSON.stringify(process.env.BASE_HOST_URL),
          BASE_HOST_PROTOCOL: JSON.stringify(process.env.BASE_HOST_PROTOCOL),
+         SESSION_SECRET: JSON.stringify(process.env.SESSION_SECRET),
       }),
    ],
 };

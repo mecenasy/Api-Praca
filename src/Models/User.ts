@@ -4,7 +4,8 @@ import { Role } from './Role';
 
 export interface IUser {
    user: string;
-   password: string;
+   hash: string;
+   salt: string;
    role: Role;
    personId: any;
    active?: boolean;
@@ -16,7 +17,8 @@ const userSchema = new Schema({
       type: String,
       unique: true,
    },
-   password: String,
+   hash: String,
+   salt: String,
    personId: {
       type: Schema.Types.ObjectId,
       ref: 'person',
@@ -36,6 +38,4 @@ const userSchema = new Schema({
    }
 });
 
-const userModel = model<IUser & Document>('user', userSchema);
-
-export default userModel;
+export default model<IUser & Document>('user', userSchema);

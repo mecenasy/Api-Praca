@@ -10,6 +10,7 @@ declare namespace NodeJS {
       ASSETS_FOLDER: string;
       BASE_HOST_URL: string;
       BASE_HOST_PROTOCOL: string;
+      SESSION_SECRET: string;
    }
 }
 
@@ -23,4 +24,11 @@ declare const CORS_ORIGIN_PATH: string;
 declare const ASSETS_FOLDER: string;
 declare const BASE_HOST_URL: string;
 declare const BASE_HOST_PROTOCOL: string;
+declare const SESSION_SECRET: string;
 
+declare module 'crypto' {
+   function generateKeyPairSync(
+      type: 'rsa',
+      options: RSAKeyPairOptions<'pem', 'pem'>,
+   ): KeyPairSyncResult<string, string>;
+}

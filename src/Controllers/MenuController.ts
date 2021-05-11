@@ -14,8 +14,8 @@ export class MenuController extends Controller {
 
    public initializeRoute = () => {
       this.router
-         .get(this.routePath, this.getMenu)
-         .post(this.routePath, this.addMenuItem);
+         .get(this.routePath, this.authenticate, this.getMenu)
+         .post(this.routePath, this.authenticate, this.isAdmin, this.addMenuItem);
 
       return this;
    }
