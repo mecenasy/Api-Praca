@@ -55,6 +55,8 @@ class App {
          saveUninitialized: true,
          store: SessionStore,
          cookie: {
+            sameSite: 'none',
+            secure: true,
             maxAge: 1000 * 60 * 60 * 24,
          },
       }));

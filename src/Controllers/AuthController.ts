@@ -54,7 +54,7 @@ class AuthController extends Controller {
             if (isValid) {
                const { expiresIn, token } = issueJWT(userFounded);
 
-               res.cookie('jwt', token, { maxAge: expiresIn , httpOnly: true});
+               res.cookie('jwt', token, { maxAge: expiresIn, sameSite: 'none', secure: true });
                res.status(200)
                   .send({
                      user: {
