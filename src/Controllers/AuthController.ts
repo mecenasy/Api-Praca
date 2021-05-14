@@ -31,10 +31,7 @@ class AuthController extends Controller {
          res.cookie('jwt', token, { maxAge: expiresIn });
          res.status(200)
             .send({
-               loggedIn: true,
-               name: userFounded?.user,
-               personId: userFounded?.personId,
-               role: userFounded?.role,
+               expiresIn,
                token,
             });
 
@@ -49,22 +46,26 @@ class AuthController extends Controller {
       }
 
       try {
-         const user = await UserModel.findOne({ user: body.user });
+         const userFounded = await UserModel.findOne({ user: body.user });
 
-         if (user) {
-            const isValid = validatePassword(body.password, user.hash, user.salt);
+         if (userFounded) {
+            const isValid = validatePassword(body.password, userFounded.hash, userFounded.salt);
 
             if (isValid) {
-               const { expiresIn, token } = issueJWT(user);
+               const { expiresIn, token } = issueJWT(userFounded);
 
-               res.cookie('jwt', token, { maxAge: expiresIn });
+               res.cookie('jwt', token, { maxAge: expiresIn , httpOnly: true});
                res.status(200)
                   .send({
-                     loggedIn: true,
-                     name: user.user,
-                     personId: user.personId,
-                     role: user.role,
-                     token,
+                     user: {
+                        name: userFounded?.user,
+                        personId: userFounded?.personId,
+                        role: userFounded?.role,
+                     },
+                     auth: {
+                        expiresIn,
+                        token,
+                     }
                   });
             } else {
                res.status(401).send({ loggedIn: false, message: 'you are not authorized' })
