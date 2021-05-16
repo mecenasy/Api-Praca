@@ -29,7 +29,7 @@ const userSchema = new Schema({
       default: Role.Student,
    },
    isDefaultPassword: {
-      type: String,
+      type: Boolean,
       default: true,
    },
    active: {

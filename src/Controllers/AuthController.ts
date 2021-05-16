@@ -58,9 +58,10 @@ class AuthController extends Controller {
                res.status(200)
                   .send({
                      user: {
-                        name: userFounded?.user,
-                        personId: userFounded?.personId,
-                        role: userFounded?.role,
+                        name: userFounded.user,
+                        personId: userFounded.personId,
+                        role: userFounded.role,
+                        isDefaultPassword: userFounded.isDefaultPassword,
                      },
                      auth: {
                         expiresIn,
@@ -115,6 +116,7 @@ class AuthController extends Controller {
 
          foundUser.hash = hash
          foundUser.salt = salt
+         foundUser.isDefaultPassword = false;
 
          await foundUser.save();
 
