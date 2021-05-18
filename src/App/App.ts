@@ -6,7 +6,6 @@ import session from 'express-session';
 import connectMongo from 'connect-mongo';
 import MongoDB from '../DB/MongoDB';
 import { IController } from '../Interface/IController';
-import AuthConfiguration from '../Auth/AuthConfiguration';
 
 class App {
    constructor() {
@@ -26,7 +25,6 @@ class App {
       this.setCorse()
          .parseBody()
          .cookieParser()
-         .initializePassport();
 
       this.connectToDataBase();
 
@@ -55,9 +53,7 @@ class App {
          saveUninitialized: true,
          store: SessionStore,
          cookie: {
-            sameSite: 'none',
-            secure: true,
-            maxAge: 1000 * 60 * 60 * 24,
+            maxAge: 1000 * 60 * 60, // ms * s * m
          },
       }));
    }
@@ -85,12 +81,6 @@ class App {
 
    private cookieParser = (): App => {
       this.app.use(cookieParser());
-
-      return this;
-   }
-
-   private initializePassport = (): App => {
-      new AuthConfiguration(this.app);
 
       return this;
    }

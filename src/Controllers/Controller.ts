@@ -1,6 +1,6 @@
 import { RequestHandler, Router } from 'express';
-import passport from 'passport';
-import { isAdmin } from '../Auth/authMiddleware';
+
+import { isAdmin, authenticate } from '../Auth/authMiddleware';
 import { assetsUrl, baseHostUrl } from '../helpers/hostUrlHelpers';
 import { IController } from '../Interface/IController';
 
@@ -11,7 +11,7 @@ abstract class Controller implements IController {
       this.baseHostUrl = baseHostUrl();
       this.assetsUrl = assetsUrl();
       this.isAdmin = isAdmin;
-      this.authenticate = passport.authenticate('jwt', { session: false });
+      this.authenticate = authenticate;
    }
 
    public routePath: string;

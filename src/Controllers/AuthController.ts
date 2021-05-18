@@ -28,19 +28,30 @@ class AuthController extends Controller {
 
          const { expiresIn, token } = issueJWT(userFounded);
 
-         res.cookie('jwt', token, { maxAge: expiresIn });
-         res.status(200)
-            .send({
-               expiresIn,
-               token,
-            });
-
+         if (userFounded) {
+            res.cookie('jwt', token, { maxAge: expiresIn });
+            res.status(200)
+               .send({
+                  user: {
+                     name: userFounded.user,
+                     personId: userFounded.personId,
+                     role: userFounded.role,
+                     isDefaultPassword: userFounded.isDefaultPassword,
+                  },
+                  auth: {
+                     expiresIn,
+                     token,
+                  },
+               });
+         } else {
+            res.status(401).send({ loggedIn: false, message: 'you are not authorized' });
+         }
       } catch (error) {
          return res.status(503).send({ message: 'something wrong' });
       }
    }
 
-   private login = async ({ body }: Request, res: Response) => {
+   private login = async ({ body, session }: Request, res: Response) => {
       if ((!body?.user && !body?.password)) {
          return res.status(400).send({ message: 'bud request' });
       }
@@ -54,7 +65,7 @@ class AuthController extends Controller {
             if (isValid) {
                const { expiresIn, token } = issueJWT(userFounded);
 
-               res.cookie('jwt', token, { maxAge: expiresIn, sameSite: 'none', secure: true });
+               res.cookie('jwt', token, { maxAge: expiresIn });
                res.status(200)
                   .send({
                      user: {
@@ -66,13 +77,13 @@ class AuthController extends Controller {
                      auth: {
                         expiresIn,
                         token,
-                     }
+                     },
                   });
             } else {
-               res.status(401).send({ loggedIn: false, message: 'you are not authorized' })
+               res.status(401).send({ loggedIn: false, message: 'you are not authorized' });
             }
          } else {
-            res.status(401).send({ loggedIn: false, message: 'you are not authorized' })
+            res.status(401).send({ loggedIn: false, message: 'you are not authorized' });
          }
       } catch (error) {
          res.status(503).send({ message: 'something wrong' });
@@ -80,8 +91,8 @@ class AuthController extends Controller {
    }
 
    private logout = async (req: Request, res: Response) => {
-      req.logout();
       res.clearCookie('connect.sid');
+      res.clearCookie('jwt');
       req.session.destroy(() => {
          res.status(200).send({
             loggedIn: false,

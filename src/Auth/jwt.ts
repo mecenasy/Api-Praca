@@ -10,7 +10,7 @@ export const issueJWT: IssueJWT = (user) => {
       iat: Date.now(),
    };
 
-   const expiresIn = 3600;
+   const expiresIn = 1000 * 60 * 60; // ms * s * m
 
    const privKey = fs.readFileSync(path.join(__dirname, 'rsa_priv.pem'),);
    const token = jwt.sign(payload, privKey, { algorithm: 'RS256', expiresIn });
