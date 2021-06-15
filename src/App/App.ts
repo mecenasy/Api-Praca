@@ -42,20 +42,34 @@ class App {
    private connectToDataBase = async () => {
       const mongodb = MongoDB.getInstance();
 
-      const SessionStore = connectMongo.create({
-         clientPromise: mongodb.client,
-         collectionName: 'session',
-      });
+      if (!DEV) {
+         const SessionStore = connectMongo.create({
+            clientPromise: mongodb.client,
+            collectionName: 'session',
+         });
 
-      this.app.use(session({
-         secret: SESSION_SECRET,
-         resave: true,
-         saveUninitialized: true,
-         store: SessionStore,
-         cookie: {
-            maxAge: 1000 * 60 * 60, // ms * s * m
-         },
-      }));
+         this.app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Credentials', 'true');
+            res.header("Access-Control-Allow-Origin", CORS_ORIGIN_PATH);
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
+            res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS");
+            next();
+         });
+
+         this.app.use(session({
+            secret: SESSION_SECRET,
+            resave: true,
+            saveUninitialized: true,
+            store: SessionStore,
+            proxy: true,
+            cookie: {
+               maxAge: 1000 * 60 * 60, // ms * s * m
+               httpOnly: false,
+               sameSite: 'none',
+               secure: true,
+            },
+         }));
+      }
    }
 
    private setCorse = (): App => {

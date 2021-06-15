@@ -38,7 +38,7 @@ export class PersonController extends Controller {
 
    private getPersonById = async (req: Request, res: Response) => {
       const personId = req.params.personId;
-      req.session.touch();
+      // req.session.touch();
 
       if (!personId) {
          res.status(400)

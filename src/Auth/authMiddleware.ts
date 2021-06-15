@@ -16,9 +16,10 @@ export const isAdmin: RequestHandler = (req, res, next) => {
 };
 
 export const authenticate: RequestHandler = async (req, res, next) => {
-   console.log("🚀 ~ file: authMiddleware.ts ~ line 19 ~ constauthenticate:RequestHandler= ~ req", req.originalUrl)
-   if (req.cookies['jwt']?.match(/\S+\.\S+\.\S+/)) {
-      const token = req.cookies['jwt'];
+   const authorization = req.headers.authorization?.split(' ');
+
+   if (authorization?.length === 2 && authorization[1].match(/\S+\.\S+\.\S+/)) {
+      const token = authorization[1];
       const publicKey = fs.readFileSync(path.join(__dirname, 'rsa_pub.pem'));
       try {
          const verify = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
@@ -29,15 +30,27 @@ export const authenticate: RequestHandler = async (req, res, next) => {
             if (user) {
                req.user = user
             } else {
-
+               return res.status(401)
+                  .send({
+                     loggedIn: false,
+                     message: 'you are not authorized'
+                  });
             }
          }
 
          next()
       } catch (error) {
-         res.status(401).send({ loggedIn: false, message: 'you are not authorized' },);
+         res.status(401)
+            .send({
+               loggedIn: false,
+               message: 'you are not authorized'
+            });
       }
    } else {
-      res.status(401).send({ loggedIn: false, message: 'you are not authorized' },);
+      res.status(401)
+         .send({
+            loggedIn: false,
+            message: 'you are not authorized'
+         });
    }
 };

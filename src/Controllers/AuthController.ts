@@ -65,7 +65,6 @@ class AuthController extends Controller {
             if (isValid) {
                const { expiresIn, token } = issueJWT(userFounded);
 
-               res.cookie('jwt', token, { maxAge: expiresIn });
                res.status(200)
                   .send({
                      user: {
@@ -91,13 +90,18 @@ class AuthController extends Controller {
    }
 
    private logout = async (req: Request, res: Response) => {
-      res.clearCookie('connect.sid');
-      res.clearCookie('jwt');
-      req.session.destroy(() => {
+      if (DEV) {
          res.status(200).send({
             loggedIn: false,
          });
-      });
+      } else {
+         req.session.destroy(() => {
+            res.clearCookie('connect.sid');
+            res.status(200).send({
+               loggedIn: false,
+            });
+         });
+      }
    }
 
    private removeUser = async (req: Request, res: Response) => {
