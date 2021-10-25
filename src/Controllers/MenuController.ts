@@ -1,76 +1,35 @@
 import { Response, Request } from 'express';
-import { Aggregate } from 'mongoose';
-import { imageUrl } from '../helpers/hostUrlHelpers';
-import MenuModel, { IMenu, MenuSide } from '../Models/Menu';
-import Controller from './Controller';
+import { interfaces, controller, httpPost, request, response, httpGet } from "inversify-express-utils";
+import { inject } from "inversify";
+import { MenuService, MenuServiceType } from '../Services/MenuService';
+import { IMenu } from '../Models/Menu';
+import { AuthenticateType } from '../Middlewares/Authenticate';
 
+@controller('/menu')
+export class MenuController implements interfaces.Controller {
+   constructor(@inject(MenuServiceType) private menuSer: MenuService) { }
 
-export class MenuController extends Controller {
-   constructor() {
-      super('/menu');
+   @httpGet('/', AuthenticateType)
+   public async getMenu(@response() res: Response) {
+      const menu: IMenu[] = await this.menuSer.getMenu()
 
-      this.initializeRoute();
-   }
-
-   public initializeRoute = () => {
-      this.router
-         .get(this.routePath, this.authenticate, this.getMenu)
-         .post(this.routePath, this.authenticate, this.isAdmin, this.addMenuItem);
-
-      return this;
-   }
-
-   private getMenu = async (req: Request, res: Response) => {
-      const menu: IMenu[] = await new Aggregate()
-         .model(MenuModel)
-         .project({
-            name: 1,
-            shortName: 1,
-            link: 1,
-            position: 1,
-            menuSide: 1,
-            image: 1,
-            hidden: 1,
-            _id: 0
-         })
-         .sort({ position: 1 })
-         .exec();
-
-      const menuItems = menu.map(({ image, ...rest }): IMenu => {
-
-         return { ...rest, image: imageUrl(image) };
-      });
-
-      res.send(menuItems)
+      res.send(menu)
          .status(200);
    }
 
-   private addMenuItem = async (req: Request, res: Response) => {
-      const { name, link, image, position, shortName, menuSide, hidden }: IMenu = req.body;
-
-      if (name && link && image && (menuSide === MenuSide.Left || menuSide === MenuSide.Right)) {
-         const existingItem = await MenuModel.findOne({ name });
-
-         if (existingItem) {
-            res.send({ message: 'menu item exist' })
-               .status(400);
-            return;
-         }
-
+   @httpPost('/', AuthenticateType)
+   public async addMenuItem(@request() { body }: Request, @response() res: Response) {
+      if (this.menuSer.checkMenuItem(body)) {
          try {
-            await MenuModel.insertMany({
-               name,
-               position,
-               shortName,
-               menuSide,
-               link,
-               image,
-               hidden
-            });
+            const isAdded = await this.menuSer.addMenuItem(body);
 
-            res.send({ message: 'menu item added' })
-               .status(200);
-            return;
+            if (isAdded) {
+               res.send({ message: 'menu item added' })
+                  .status(200);
+            } else {
+               res.send({ message: 'menu item exist' })
+                  .status(400);
+            }
 
          } catch (error) {
             res.send(error);

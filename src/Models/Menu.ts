@@ -1,4 +1,4 @@
-import { Schema, Document, model } from "mongoose";
+import { Schema, Document, model, Model } from "mongoose";
 import { imageUrl } from "../helpers/hostUrlHelpers";
 
 export enum MenuSide {
@@ -16,7 +16,10 @@ export interface IMenu {
    image: string;
 }
 
-const menuSchema = new Schema<IMenu & Document>({
+export type MenuDocument = IUser & Document;
+export type IMenuModel = Model<MenuDocument>;
+
+const menuSchema = new Schema<MenuDocument>({
    name: String,
    shortName: {
       type: String,
@@ -42,4 +45,4 @@ const menuSchema = new Schema<IMenu & Document>({
    },
 });
 
-export default model<IMenu & Document>('menu', menuSchema);
+export default model<MenuDocument>('menu', menuSchema);

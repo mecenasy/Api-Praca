@@ -3,64 +3,61 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
 import session from 'express-session';
-import connectMongo from 'connect-mongo';
-import MongoDB from '../DB/MongoDB';
-import { IController } from '../Interface/IController';
+import { MongoClient } from 'mongodb'
+import { Db } from '../Db/Db';
+import { RegistryService } from '../RegistryServices/RegistryService';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
 class App {
    constructor() {
-      this.app = express();
-      this.controllers = [];
+      this.service = new RegistryService();
+      this.server = new InversifyExpressServer(this.service.getContainer());
+      this.server.setConfig(this.configure);
+      this.app = this.server.build();
       this.port = process.env.PORT || PORT;
-
-      this.configure();
    }
 
+   private server: InversifyExpressServer;
+   private service: RegistryService;
    private static instance: App;
    private app: Application;
-   private controllers: IController[];
    private port: number;
 
-   private configure = () => {
-      this.setCorse()
-         .parseBody()
-         .cookieParser()
+   private configure = (app: Application) => {
+      this.setCorse(app)
+         .parseBody(app)
+         .cookieParser(app)
+         .setStaticRouter(app);
 
-      this.connectToDataBase();
-
-      this.setStaticRouter();
+      this.connectToDataBase(app);
    }
 
-   private parseBody = (): App => {
-      this.app.use(express.urlencoded({ extended: true }));
-      this.app.use(express.json());
+   private parseBody = (app: Application): App => {
+      app.use(express.urlencoded({ extended: true }));
+      app.use(express.json());
 
       return this;
    }
 
 
-   private connectToDataBase = async () => {
-      const mongodb = MongoDB.getInstance();
-
+   private connectToDataBase = async (app: Application) => {
+      const store = this.service.getService<Db<MongoClient>>(Db).getStore();
       if (!DEV) {
-         const SessionStore = connectMongo.create({
-            clientPromise: mongodb.client,
-            collectionName: 'session',
-         });
-
-         this.app.use((req, res, next) => {
+         app.use((req, res, next) => {
             res.header('Access-Control-Allow-Credentials', 'true');
             res.header("Access-Control-Allow-Origin", CORS_ORIGIN_PATH);
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
             res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS");
+            console.log(res.getHeaders());
+
             next();
          });
 
-         this.app.use(session({
+         app.use(session({
             secret: SESSION_SECRET,
             resave: true,
             saveUninitialized: true,
-            store: SessionStore,
+            store,
             proxy: true,
             cookie: {
                maxAge: 1000 * 60 * 60, // ms * s * m
@@ -72,8 +69,8 @@ class App {
       }
    }
 
-   private setCorse = (): App => {
-      this.app.use(cors({
+   private setCorse = (app: Application): App => {
+      app.use(cors({
          origin: [CORS_ORIGIN_PATH],
          optionsSuccessStatus: 200,
          credentials: true,
@@ -82,25 +79,19 @@ class App {
       return this;
    }
 
-   private setStaticRouter = (): App => {
-      this.app.use(
+   private setStaticRouter = (app: Application): App => {
+      app.use(
          '/assets',
          express.static(
-            path.resolve(__dirname, '../assets'),
+            path.resolve(__dirname, '../build/assets'),
          ),
       );
 
       return this;
    }
 
-   private cookieParser = (): App => {
-      this.app.use(cookieParser());
-
-      return this;
-   }
-
-   public setController = (controller: IController) => {
-      this.controllers.push(controller);
+   private cookieParser = (app: Application): App => {
+      app.use(cookieParser());
 
       return this;
    }
@@ -109,14 +100,6 @@ class App {
       this.app.listen(this.port, () => {
          console.log(`Server Api started on port ${this.port}`);
       });
-   }
-
-   public initializeControllers = () => {
-      this.controllers.forEach((controller) => {
-         this.app.use(controller.router);
-      });
-
-      return this;
    }
 
    public static getInstance = () => {

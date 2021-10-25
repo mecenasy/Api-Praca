@@ -11,7 +11,7 @@ export interface IRole {
    role: Role;
 }
 
-const userRoleSchema = new Schema({
+const userRoleSchema = new Schema<IRole & Document>({
    role: {
       type: String,
       enum: [Role.Admin, Role.Student, Role.Teacher],

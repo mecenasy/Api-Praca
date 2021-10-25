@@ -9,7 +9,7 @@ export interface IDirection {
    direction: Direction;
 }
 
-const directionSchema = new Schema({
+const directionSchema = new Schema<IDirection & Document>({
    direction: {
       type: String,
       enum: [Direction.Informatics, Direction.Management],

@@ -9,7 +9,7 @@ export interface ISpecialty {
    specialty: Specialty;
 }
 
-const specialtySchema = new Schema({
+const specialtySchema = new Schema<ISpecialty & Document>({
    specialty: {
       type: String,
       enum: [Specialty.Programming, Specialty.Networks],

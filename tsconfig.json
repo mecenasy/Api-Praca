@@ -7,6 +7,9 @@
          "dom.iterable",
          "esnext"
       ],
+      "types": [
+         "reflect-metadata"
+      ],
       "allowSyntheticDefaultImports": true,
       "skipLibCheck": true,
       "esModuleInterop": true,
@@ -17,6 +20,9 @@
       "isolatedModules": true,
       "noEmit": true,
       "jsx": "react",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "strictPropertyInitialization": false
    },
    "include": [
       "./",

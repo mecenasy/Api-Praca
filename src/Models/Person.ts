@@ -1,4 +1,4 @@
-import { Schema, Document, model } from "mongoose";
+import { Schema, Document, model, Model } from "mongoose";
 import { Direction } from "./Direction";
 import { Specialty } from "./Specialty";
 import { IAddress } from "./Address";
@@ -8,6 +8,8 @@ export interface Person extends Omit<IPerson, 'album'> {
    address: IAddress;
    role: Role;
 }
+export type PersonDocument = IPerson & Document;
+export type IPersonModel = Model<PersonDocument>;
 export interface IPerson {
    album: number;
    direction: Direction;
@@ -22,7 +24,7 @@ export interface IPerson {
    photo?: string;
 }
 
-const personSchema = new Schema({
+const personSchema = new Schema<PersonDocument>({
    album: {
       type: Number,
       unique: true,
@@ -45,4 +47,4 @@ const personSchema = new Schema({
    photo: String,
 });
 
-export default model<IPerson & Document>('person', personSchema);
+export default model<PersonDocument>('person', personSchema);

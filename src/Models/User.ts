@@ -1,18 +1,11 @@
 
-import { Schema, Document, model } from 'mongoose';
+import { Schema, Document, model, Model } from 'mongoose';
 import { Role } from './Role';
 
-export interface IUser {
-   user: string;
-   hash: string;
-   salt: string;
-   role: Role;
-   personId: any;
-   active?: boolean;
-   isDefaultPassword?: boolean;
-}
+export type UserDocument = IUser & Document;
+export type IUserModel = Model<UserDocument>;
 
-const userSchema = new Schema({
+const userSchema = new Schema<UserDocument>({
    user: {
       type: String,
       unique: true,
@@ -38,4 +31,4 @@ const userSchema = new Schema({
    }
 });
 
-export default model<IUser & Document>('user', userSchema);
+export default model<UserDocument>('user', userSchema);

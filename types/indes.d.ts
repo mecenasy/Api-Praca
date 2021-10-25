@@ -13,6 +13,15 @@ declare namespace NodeJS {
       SESSION_SECRET: string;
    }
 }
+interface IUser {
+   user: string;
+   hash: string;
+   salt: string;
+   role: Role;
+   personId: any;
+   active?: boolean;
+   isDefaultPassword?: boolean;
+}
 
 declare const DEV: boolean;
 declare const PORT: number;
@@ -31,4 +40,14 @@ declare module 'crypto' {
       type: 'rsa',
       options: RSAKeyPairOptions<'pem', 'pem'>,
    ): KeyPairSyncResult<string, string>;
+}
+
+declare namespace Express {
+   export interface Request {
+      user: IUser;
+      isAuthenticated(): boolean
+   }
+   export interface Response {
+      user: IUser;
+   }
 }

@@ -1,4 +1,4 @@
-import { Schema, Document, model } from 'mongoose';
+import { Schema, Document, model, Model } from 'mongoose';
 
 export interface IAddress {
    street: string;
@@ -9,7 +9,10 @@ export interface IAddress {
    personId: any;
 }
 
-const addressSchema = new Schema({
+export type AddressDocument = IAddress & Document;
+export type IAddressModel = Model<AddressDocument>;
+
+const addressSchema = new Schema<AddressDocument>({
    street: String,
    number: String,
    city: String,
@@ -21,4 +24,4 @@ const addressSchema = new Schema({
    },
 });
 
-export default model<IAddress & Document>('address', addressSchema);
+export default model<AddressDocument>('address', addressSchema);
