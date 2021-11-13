@@ -1,5 +1,5 @@
 
-import { Schema, Document, model } from 'mongoose';
+import { Schema, Document, model, Model } from 'mongoose';
 
 export enum Role {
    Student = 'student',
@@ -10,6 +10,9 @@ export enum Role {
 export interface IRole {
    role: Role;
 }
+
+export type RoleDocument = IRole & Document;
+export type IRoleModel = Model<RoleDocument>;
 
 const userRoleSchema = new Schema<IRole & Document>({
    role: {

@@ -1,5 +1,6 @@
 import { Schema, Document, model, Model } from "mongoose";
 import { imageUrl } from "../helpers/hostUrlHelpers";
+import RoleModel, { Role } from "./Role";
 
 export enum MenuSide {
    Left = 'left',
@@ -14,6 +15,7 @@ export interface IMenu {
    hidden?: boolean;
    link: string;
    image: string;
+   role: Role[];
 }
 
 export type MenuDocument = IUser & Document;
@@ -36,13 +38,17 @@ const menuSchema = new Schema<MenuDocument>({
    },
    menuSide: {
       type: String,
-      enum: [MenuSide.Left, MenuSide.Right],
+      enum: MenuSide,
    },
    link: String,
    image: {
       type: String,
       get: imageUrl,
    },
+   role: {
+      type: [String],
+      enum: Role,
+   }
 });
 
 export default model<MenuDocument>('menu', menuSchema);

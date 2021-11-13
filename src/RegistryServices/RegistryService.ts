@@ -10,6 +10,7 @@ import { User, UserType } from '../Middlewares/User';
 import { UserService, UserServiceType } from '../Services/UserService';
 import { MenuService, MenuServiceType } from '../Services/MenuService';
 import { PersonService, PersonServiceType } from '../Services/PersonService';
+import { RoleService, RoleServiceType } from '../Services/RoleService';
 import { AddressService, AddressServiceType } from '../Services/AddressService';
 //Controlers
 import '../Controllers/Auth/LoginController';
@@ -17,6 +18,7 @@ import '../Controllers/Auth/LogoutController';
 import '../Controllers/Auth/RefreshTokenController';
 import '../Controllers/MenuController';
 import '../Controllers/PersonController';
+import '../Controllers/RoleController';
 
 export class RegistryService {
    private service: IService;
@@ -30,6 +32,7 @@ export class RegistryService {
       this.service.registry(PersonServiceType, PersonService);
       this.service.registry(AddressServiceType, AddressService);
       this.service.registry(AuthenticateType, Authenticate);
+      this.service.registry(RoleServiceType, RoleService);
       this.service.registry(AdminType, Admin);
       this.service.registry(UserType, User);
    }
