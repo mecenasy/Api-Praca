@@ -60,10 +60,12 @@ export class MenuService {
    }
 
    public checkMenuItem(item: IMenu): boolean {
-      const { name, link, image, menuSide }: IMenu = item;
+      const { name, link, image, menuSide, role, position, }: IMenu = item;
 
       return Boolean(
-         name
+         role
+         && position
+         && name
          && link
          && image
          && (menuSide === MenuSide.Left || menuSide === MenuSide.Right)
@@ -94,20 +96,24 @@ export class MenuService {
 
    }
 
-   public async updateMenuItem(item: Partial<IMenu> & { id: string }): Promise<MenuDocument | null> {
-      const { id, ...menu } = item;
+   public async updateMenuItem(item: Partial<IMenu> & { _id: string }): Promise<MenuDocument | null> {
+      const { _id, ...menu } = item;
 
       try {
-         await this.menuModel.findByIdAndUpdate(id, menu);
-         return await this.menuModel.findById(id);
+         await this.menuModel.findByIdAndUpdate(_id, menu, { useFindAndModify: false });
+         return await this.menuModel.findById(_id);
       } catch (error) {
          return null;
       }
    }
 
    public async removeMenuItem(id: string): Promise<boolean> {
-      const existingItem = await this.menuModel.findByIdAndRemove(id);
-
-      return !existingItem;
+      try {
+         await this.menuModel.findByIdAndRemove(id, { useFindAndModify: false });
+         const existingItem = await this.menuModel.findById(id);
+         return !existingItem;
+      } catch (error) {
+         return false;
+      }
    }
 }

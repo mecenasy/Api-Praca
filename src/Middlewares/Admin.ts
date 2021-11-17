@@ -10,7 +10,7 @@ export class Admin extends BaseMiddleware {
    public async handler(req: Request, res: Response, next: NextFunction) {
       const user: IUser = req.user;
 
-      if (req.isAuthenticated() && user.role === Role.Admin) {
+      if (user.role === Role.Admin) {
          next();
       } else {
          res.status(401).send({ message: 'Not authorized' });

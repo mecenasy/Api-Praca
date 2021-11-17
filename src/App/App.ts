@@ -7,6 +7,7 @@ import { MongoClient } from 'mongodb'
 import { Db } from '../Db/Db';
 import { RegistryService } from '../RegistryServices/RegistryService';
 import { InversifyExpressServer } from 'inversify-express-utils';
+import fileUpload from 'express-fileupload';
 
 class App {
    constructor() {
@@ -33,6 +34,7 @@ class App {
    }
 
    private parseBody = (app: Application): App => {
+      app.use(fileUpload());
       app.use(express.urlencoded({ extended: true }));
       app.use(express.json());
 
@@ -48,7 +50,6 @@ class App {
             res.header("Access-Control-Allow-Origin", CORS_ORIGIN_PATH);
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
             res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS");
-            console.log(res.getHeaders());
 
             next();
          });
